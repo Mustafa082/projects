@@ -62,7 +62,7 @@ func ShowTrainingInfo(action int, trainingType string, duration, weight, height 
 	case "Плавание":
 		distance := distance(action) // вызовите здесь необходимую функцию
 		speed := swimmingMeanSpeed(lengthPool, countPool, duration) // вызовите здесь необходимую функцию
-		calories := RunningSpentCalories(action, weight, duration) // вызовите здесь необходимую функцию
+		calories := SwimmingSpentCalories(lengthPool, countPool, duration, weight) // вызовите здесь необходимую функцию
 		return fmt.Sprintf("Тип тренировки: %s\nДлительность: %.2f ч.\nДистанция: %.2f км.\nСкорость: %.2f км/ч\nСожгли калорий: %.2f\n", trainingType, duration, distance, speed, calories)
 	default:
 		return "неизвестный тип тренировки"
@@ -104,10 +104,9 @@ const (
 // height float64 — рост пользователя.
 func WalkingSpentCalories(action int, duration, weight, height float64) float64 {
 
- callFunc := meanSpeed(action, duration)
- res := float64(callFunc)
+ speed := meanSpeed(action, duration) / 3.6
 
- return ((walkingCaloriesWeightMultiplier * weight + (math.Pow(res, 2) / height) * walkingSpeedHeightMultiplier * weight) * duration * minInH)
+ return ((walkingCaloriesWeightMultiplier * weight + (math.Pow(speed, 2) / height) * walkingSpeedHeightMultiplier * weight) * duration * minInH)
 }
 
 // Константы для расчета калорий, расходуемых при плавании.
@@ -140,8 +139,8 @@ func swimmingMeanSpeed(lengthPool, countPool int, duration float64) float64 {
 // weight float64 — вес пользователя.
 func SwimmingSpentCalories(lengthPool, countPool int, duration, weight float64) float64 {
     //(СредняяСкоростьВКм/ч + 1.1) * 2 * ВесСпортсменаВКг * ВремяТренировкиВЧасах
-    callFunc := swimmingMeanSpeed(lengthPool, countPool, duration)
-    res := float64(callFunc)
-    return (res + swimmingCaloriesMeanSpeedShift) * swimmingCaloriesWeightMultiplier * weight * duration
+    res := swimmingMeanSpeed(lengthPool, countPool, duration)
+    
+    return (float64(res) + swimmingCaloriesMeanSpeedShift) * swimmingCaloriesWeightMultiplier * weight * duration
 }
 //action int, trainingType string, duration, weight, height float64, lengthPool, countPool int
